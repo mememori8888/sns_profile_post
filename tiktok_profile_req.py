@@ -28,7 +28,7 @@ def get_api_key_from_snapshot(filepath="api_key.json"):
 def profile_req(api_key):
     url = "https://api.brightdata.com/datasets/v3/trigger"
     headers = {
-        "Authorization": "Bearer bda3c78f-ca73-4eb9-8da4-db3bd3e401a1",
+        "Authorization": f"Bearer {api_key}",
     }
     params = {
         "dataset_id": "gd_l1villgoiiidt09ci",

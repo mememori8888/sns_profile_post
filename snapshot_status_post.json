@@ -1,0 +1,12 @@
+{
+    "status": "ready",
+    "snapshot_id": "s_m8jtvn3zyrwhzcfjv",
+    "dataset_id": "gd_lu702nij2f790tmv9h",
+    "discovery_error_codes": {
+        "crawl_failed": 1,
+        "dead_page": 1
+    },
+    "records": 0,
+    "errors": 2,
+    "collection_duration": 365272
+}

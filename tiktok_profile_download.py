@@ -83,10 +83,10 @@ def get_snapshot_info(filepath="snapshot_status.json"):
         return None
 
 # スナップショットにアクセスしてダウンロード。
-def download_file(snapshot_id):
+def download_file(snapshot_id,api_key):
     url = f"https://api.brightdata.com/datasets/v3/snapshot/{snapshot_id}"
     headers = {
-        "Authorization": "Bearer bda3c78f-ca73-4eb9-8da4-db3bd3e401a1",
+        "Authorization": f"Bearer {api_key}",
     }
     params = {
         "format": "csv",
@@ -98,7 +98,7 @@ def download_file(snapshot_id):
     # ステータスがランニングではなかったらに変更する。
     if response.status_code == 200:
         # Write the content to a CSV file
-        with open('output.csv', 'wb') as file:
+        with open('profile.csv', 'wb') as file:
             file.write(response.content)
         print("CSV file has been created successfully.")
     else:
@@ -117,7 +117,7 @@ snapshot_id = snapshot_info["snapshot_id"]
 print(f"Status: {status}")
 print(f"Snapshot ID: {snapshot_id}")
 if status == 'ready':
-    download_file(snapshot_id)
+    download_file(snapshot_id,api_Key)
 elif status == 'running':
     print("still running...")    
 else:
