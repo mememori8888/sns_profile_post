@@ -5,4 +5,4 @@ recent_post.pyはtiktok_post.csvからAPIにリクエストして、30分後にp
 csvファイルのダウンロードがうまくいかなかった場合は、公式ページのステータスを確認後、
 tiktok_profile_donwload.pyおよびtiktok_post_download.pyを実行することで直前のリクエストした内容のcsvファイルをダウンロードできます。
 
-スケジュール実行も可能です。
+
