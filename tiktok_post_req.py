@@ -1,20 +1,3 @@
-# import requests
-
-# url = "https://api.brightdata.com/datasets/v3/trigger"
-# headers = {
-# 	"Authorization": "Bearer API_TOKEN",
-# }
-# params = {
-# 	"dataset_id": "gd_lu702nij2f790tmv9h",
-# 	"include_errors": "true",
-# 	"type": "discover_new",
-# 	"discover_by": "profile_url",
-# }
-# files = {"data": ("data.csv", open("path/to/your/file.csv", "rb"), "text/csv")}
-
-# response = requests.post(url, headers=headers, params=params, files=files)
-# print(response.json())
-
 
 import requests
 import csv
