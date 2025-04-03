@@ -142,7 +142,7 @@ if api_Key:
 else:
     print("API Key not found.")
 
-post_req(api_Key)
+
 #jsonファイルが出力される。
 # 完了までに時間がかかるため、30分待機
 time.sleep(1800)
