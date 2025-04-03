@@ -1,0 +1,21 @@
+[
+    {
+        "ai_id": 1,
+        "uc_id": 101,
+        "url": "https://www.instagram.com/marcusfaberfdp",
+        "num_of_posts": 10,
+        "start_date": "01-01-2025",
+        "end_date": "03-01-2025",
+        "post_type": "Post"
+    },
+    {
+        "ai_id": 2,
+        "uc_id": 102,
+        "url": "https://www.instagram.com/meta/",
+        "num_of_posts": "",
+        "posts_to_not_include": ["3529568342229145484"],
+        "start_date": "03-01-2025",
+        "end_date": "03-17-2025",
+        "post_type": "Reel"
+    }
+]
