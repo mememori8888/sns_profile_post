@@ -30,32 +30,46 @@ def post_req(api_key):
     url = "https://api.brightdata.com/datasets/v3/trigger"
     headers = {
         "Authorization": f"Bearer {api_key}",
+        "Content-Type": "application/json",
     }
     params = {
-	"dataset_id": "gd_lu702nij2f790tmv9h",
-	"include_errors": "true",
-	"type": "discover_new",
-	"discover_by": "profile_url",
+        "dataset_id": "gd_lk5ns7kz21pck8jpis",
+        "include_errors": "true",
+        "type": "discover_new",
+        "discover_by": "url",
     }
 
+    with open('data.json', 'r') as f:
+        raw_data = json.load(f)
 
-    # Use 'with' statement to open the file
-    with open("tiktok_post.csv", "rb") as file:
-        files = {"data": ("tiktok_post.csv", file, "text/csv")}
-        response = requests.post(url, headers=headers, params=params, files=files, verify=False)
-        print(response.json())
-        json_data = response.json()
+    # Create mapping of URLs to their corresponding IDs
+    id_mapping = {item['url']: {'ai_id': item['ai_id'], 'uc_id': item['uc_id']} for item in raw_data}
 
-    # jsonファイルで出力
-    with open("snapshot_id_post.json", "w", encoding="utf-8") as f:
-        json.dump(json_data, f, ensure_ascii=False, indent=4)
+    # Remove ai_id and uc_id from each item
+    data = []
+    for item in raw_data:
+        filtered_item = {k: v for k, v in item.items() if k not in ['ai_id', 'uc_id']}
+        data.append(filtered_item)
 
-    print("Snapshot id has been saved to snapshot_id.json")
+    response = requests.post(url, headers=headers, params=params, json=data)
+    response_data = response.json()
+
+    # Add ai_id and uc_id to response data based on URL
+    if isinstance(response_data, dict) and 'data' in response_data:
+        for item in response_data['data']:
+            if 'url' in item and item['url'] in id_mapping:
+                item.update(id_mapping[item['url']])
+
+    # Save response to JSON file
+    output_file = 'snapshot_id_post_insta.json'
+    with open(output_file, 'w', encoding='utf-8') as f:
+        json.dump(response_data, f, ensure_ascii=False, indent=4)
+
+    print(f"Response has been saved to {output_file}")
 
 
 
-
-def get_snapshot_id(filepath = 'snapshot_id_post.json'):
+def get_snapshot_id(filepath = 'snapshot_id_post_insta.json'):
     with open(filepath,'r',encoding='utf-8') as f:
         data = json.load(f)
         snapshot_id = data.get('snapshot_id')
@@ -73,14 +87,14 @@ def status_check(snapshot_id):
     json_data = response.json()
 
     # jsonファイルで出力
-    with open("snapshot_status_post.json", "w", encoding="utf-8") as f:
+    with open("snapshot_status_post_insta.json", "w", encoding="utf-8") as f:
         json.dump(json_data, f, ensure_ascii=False, indent=4)
 
     print("Snapshot status has been saved to snapshot_status.json")
 
 
 
-def get_snapshot_info(filepath="snapshot_status_post.json"):
+def get_snapshot_info(filepath="snapshot_status_post_insta.json"):
     """
     Reads the snapshot_status.json file, extracts the status and snapshot_id,
     and returns them as a dictionary.
@@ -120,20 +134,61 @@ def download_file(snapshot_id,api_key):
         "Authorization": f"Bearer {api_key}",
     }
     params = {
-        "format": "csv",
+        "format": "json",
     }
 
     response = requests.get(url, headers=headers, params=params)
     print(response)
+    json_data = response.json()
+    output_file = 'post_insta.json'
+
+
     # Check if the request was successful
     # ステータスがランニングではなかったらに変更する。
     if response.status_code == 200:
         # Write the content to a CSV file
-        with open('post.csv', 'wb') as file:
-            file.write(response.content)
-        print("CSV file has been created successfully.")
+        with open(output_file, 'w', encoding='utf-8') as f:
+            json.dump(json_data, f, ensure_ascii=False, indent=4)
+        print("json file has been created successfully.")
     else:
         print(f"Failed to retrieve data. Status code: {response.status_code}")
+
+def add_ai_uc_ids_from_data_json(data_filepath="data.json", post_insta_filepath="post_insta.json"):
+    """
+    data.json から ai_id と uc_id を取得し、post_insta.json の各データに対応する ai_id と uc_id を追加します。
+
+    Args:
+        data_filepath (str): data.json のファイルパス。
+        post_insta_filepath (str): post_insta.json のファイルパス。
+    """
+    try:
+        with open(data_filepath, "r", encoding="utf-8") as f:
+            data_json = json.load(f)
+
+        with open(post_insta_filepath, "r", encoding="utf-8") as f:
+            post_insta_json = json.load(f)
+
+        for post_item in post_insta_json:
+            discovery_url = post_item.get("discovery_input", {}).get("url")
+            if discovery_url:
+                for data_item in data_json:
+                    if data_item.get("url") == discovery_url:
+                        post_item["ai_id"] = data_item.get("ai_id")
+                        post_item["uc_id"] = data_item.get("uc_id")
+                        break  # 対応するデータが見つかったら、内側のループを抜ける
+
+        with open(post_insta_filepath, "w", encoding="utf-8") as f:
+            json.dump(post_insta_json, f, ensure_ascii=False, indent=4)
+
+        print(f"{post_insta_filepath} に data.json から取得した ai_id と uc_id を追加しました。")
+
+    except FileNotFoundError:
+        print(f"エラー: ファイルが見つかりません。")
+    except json.JSONDecodeError:
+        print(f"エラー: JSON ファイルのデコードに失敗しました。")
+    except Exception as e:
+        print(f"予期しないエラーが発生しました: {e}")
+
 
 api_Key = get_api_key_from_snapshot()
 
@@ -145,7 +200,8 @@ else:
 post_req(api_Key)
 #jsonファイルが出力される。
 # 完了までに時間がかかるため、30分待機
-time.sleep(1800)
+# time.sleep(1800)
+time.sleep(30)
 
 #スナップショットを確認しファイルダウンロード
 
@@ -160,6 +216,8 @@ print(f"Status: {status}")
 print(f"Snapshot ID: {snapshot_id}")
 if status == 'ready':
     download_file(snapshot_id,api_Key)
+    add_ai_uc_ids_from_data_json()
+
 elif status == 'running':
     print("still running...")    
 else:
