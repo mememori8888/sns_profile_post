@@ -142,8 +142,7 @@ profile_req(api_Key)
 # 完了までに時間がかかるため、30分待機
 time.sleep(1800)
 # スナップショットを確認し、ファイルダウンロード
-# api_keyの取得
-api_Key = get_api_key()
+
 
 # statuscheck
 snapshot_id = get_snapshot_id()
